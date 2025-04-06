@@ -11,4 +11,4 @@
 ## Realizamos las migraciones con este comando
 
 - php artisan migrate
-- php artisan migrate --path=/database/migrations/products/
+<!-- - php artisan migrate --path=/database/migrations/ -->
