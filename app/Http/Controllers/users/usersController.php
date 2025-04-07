@@ -22,27 +22,26 @@ class usersController extends Controller
 {
     use SavePdfImageTrait;
 
-    private function validateRolUser($rol_user){
+    private function validateRolUser($rol_user)
+    {
 
         $tableRoles = roles::find($rol_user);
-        if(is_null($tableRoles)){
+        if (is_null($tableRoles)) {
             return false;
         }
 
         $rol_userV = $tableRoles->tipo;
 
         return $rol_userV == 1 || $rol_userV == 2 ? true : false;
-
     }
 
     public function index()
     {
         $users = Users::with('roles')
-                        ->orderBy('email', 'asc')
-                        ->get();
-        
+            ->orderBy('email', 'asc')
+            ->get();
+
         return response()->json($users);
-          
     }
 
     public function search(Request $request)
@@ -50,34 +49,35 @@ class usersController extends Controller
         $searchTerm = $request->search;
 
         $users = Users::query()
-                            ->with('roles')
-                            ->where('email', 'like', '%'.$searchTerm.'%')
-                            ->orderBy('email', 'asc')
-                            ->get();
+            ->with('roles')
+            ->where('email', 'like', '%' . $searchTerm . '%')
+            ->orderBy('email', 'asc')
+            ->get();
 
-                            return response()->json($users);
+        return response()->json($users);
     }
 
-    public function validarUniqueUser(Request $request){
+    public function validarUniqueUser(Request $request)
+    {
         $email = $request->email;
 
-        $users = Users::query()->where('email', '=', ''.$email.'')->get();
+        $users = Users::query()->where('email', '=', '' . $email . '')->get();
 
         return response()->json($users);
     }
 
     public function show($id = 0)
     {
-        if($id <= 0){
+        if ($id <= 0) {
             return response()->json([
                 'error' => 'debe enviar el id del user'
             ], 404);
         }
 
         $users = Users::with('roles')->find($id);
-        if(is_null($users)){
+        if (is_null($users)) {
             return response()->json([
-                'error' => 'no se pudo realizar correctamente con este id '.$id.''
+                'error' => 'no se pudo realizar correctamente con este id ' . $id . ''
             ], 404);
         }
 
@@ -91,9 +91,10 @@ class usersController extends Controller
                 'email' => 'required|email|unique:users,email|min:6',
                 'password' => 'required|min:6',
                 'picture_user' => 'required|image|max:10240',
-                'estado_user' => 'required|integer',         
+                'address' => 'required|min:10',
+                'estado_user' => 'required|integer',
                 'fk_cargo' => 'required|integer',
-                'rol_user' => 'required|integer',        
+                'rol_user' => 'required|integer',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
@@ -102,7 +103,7 @@ class usersController extends Controller
         $rol_user = $request->input('rol_user');
         $rol = $this->validateRolUser($rol_user);
 
-        if($rol){
+        if ($rol) {
 
             $url = 'storage/users';
             $image = $request->file('picture_user');
@@ -112,14 +113,15 @@ class usersController extends Controller
             $user->email = $request->input('email');
             $user->password = Hash::make($request->input('password'));
             $user->picture_user = $imageUrl;
+            $user->address = $request->input('address');
             $user->estado_user = $request->input('estado_user');
             $user->fk_cargo = $request->input('fk_cargo');
             $user->save();
 
             return response()->json([
-                'ok'=> 'Usuario creado'
-            ],201);
-        }else{
+                'ok' => 'Usuario creado'
+            ], 201);
+        } else {
             return response()->json([
                 'error' => 'Access prohibited'
             ], 403);
@@ -131,9 +133,9 @@ class usersController extends Controller
         try {
             $request->validate([
                 'picture_user' => 'nullable|image|max:10240',
-                'estado_user' => 'required|integer',         
+                'estado_user' => 'required|integer',
                 'fk_cargo' => 'required|integer',
-                'rol_user' => 'required|integer',        
+                'rol_user' => 'required|integer',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
@@ -141,16 +143,16 @@ class usersController extends Controller
         $rol_user = $request->input('rol_user');
         $rol = $this->validateRolUser($rol_user);
 
-        if($rol){
-            if($id <= 0){
+        if ($rol) {
+            if ($id <= 0) {
                 return response()->json([
                     'error' => 'debe enviar el id del user'
                 ], 404);
             }
             $user = Users::find($id);
-            if(is_null($user)){
+            if (is_null($user)) {
                 return response()->json([
-                    'error' => 'no se pudo realizar correctamente con este id '.$id.''
+                    'error' => 'no se pudo realizar correctamente con este id ' . $id . ''
                 ], 404);
             }
 
@@ -166,18 +168,18 @@ class usersController extends Controller
                 $user->fk_cargo = $request->input('fk_cargo');
                 $user->save();
                 return response()->json([
-                    'ok'=> 'Usuario actualizado',
+                    'ok' => 'Usuario actualizado',
                     'url' => $imageUrl
-                ],201);
-            }else{
+                ], 201);
+            } else {
                 $user->estado_user = $request->input('estado_user');
                 $user->fk_cargo = $request->input('fk_cargo');
                 $user->save();
                 return response()->json([
-                    'ok'=> 'Usuario actualizado'
-                ],201);
+                    'ok' => 'Usuario actualizado'
+                ], 201);
             }
-        }else{
+        } else {
             return response()->json([
                 'error' => 'Access prohibited'
             ], 403);
@@ -188,9 +190,9 @@ class usersController extends Controller
     {
         try {
             $request->validate([
-                'email' => 'required|email|min:6|unique:users,email,'.$id,
+                'email' => 'required|email|min:6|unique:users,email,' . $id,
                 'password' => 'required|min:6',
-                'rol_user' => 'required|integer'      
+                'rol_user' => 'required|integer'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
@@ -199,17 +201,17 @@ class usersController extends Controller
         $rol_user = $request->rol_user;
         $rol = $this->validateRolUser($rol_user);
 
-        if($rol){
+        if ($rol) {
 
-            if($id <= 0){
+            if ($id <= 0) {
                 return response()->json([
                     'error' => 'debe enviar el id del user'
                 ], 404);
             }
             $user = Users::find($id);
-            if(is_null($user)){
+            if (is_null($user)) {
                 return response()->json([
-                    'error' => 'no se pudo realizar correctamente con este id '.$id.''
+                    'error' => 'no se pudo realizar correctamente con este id ' . $id . ''
                 ], 404);
             }
 
@@ -217,9 +219,9 @@ class usersController extends Controller
             $user->password = Hash::make($request->password);
             $user->save();
             return response()->json([
-                'ok'=> 'Credenciales actualizadas'
-            ],201);
-        }else{
+                'ok' => 'Credenciales actualizadas'
+            ], 201);
+        } else {
             return response()->json([
                 'error' => 'Access prohibited'
             ], 403);
@@ -230,8 +232,8 @@ class usersController extends Controller
     {
         try {
             $request->validate([
-                'email' => 'required|email|min:6|unique:users,email,'.$id,
-                'rol_user' => 'required|integer'      
+                'email' => 'required|email|min:6|unique:users,email,' . $id,
+                'rol_user' => 'required|integer'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
@@ -240,26 +242,26 @@ class usersController extends Controller
         $rol_user = $request->rol_user;
         $rol = $this->validateRolUser($rol_user);
 
-        if($rol){
+        if ($rol) {
 
-            if($id <= 0){
+            if ($id <= 0) {
                 return response()->json([
                     'error' => 'debe enviar el id del user'
                 ], 404);
             }
             $user = Users::find($id);
-            if(is_null($user)){
+            if (is_null($user)) {
                 return response()->json([
-                    'error' => 'no se pudo realizar correctamente con este id '.$id.''
+                    'error' => 'no se pudo realizar correctamente con este id ' . $id . ''
                 ], 404);
             }
 
             $user->email = $request->email;
             $user->save();
             return response()->json([
-                'ok'=> 'Email actualizado'
-            ],201);
-        }else{
+                'ok' => 'Email actualizado'
+            ], 201);
+        } else {
             return response()->json([
                 'error' => 'Access prohibited'
             ], 403);
@@ -272,7 +274,7 @@ class usersController extends Controller
         try {
             $request->validate([
                 'password' => 'required|min:6',
-                'rol_user' => 'required|integer'      
+                'rol_user' => 'required|integer'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
@@ -281,107 +283,57 @@ class usersController extends Controller
         $rol_user = $request->rol_user;
         $rol = $this->validateRolUser($rol_user);
 
-        if($rol){
+        if ($rol) {
 
-            if($id <= 0){
+            if ($id <= 0) {
                 return response()->json([
                     'error' => 'debe enviar el id del user'
                 ], 404);
             }
             $user = Users::find($id);
-            if(is_null($user)){
+            if (is_null($user)) {
                 return response()->json([
-                    'error' => 'no se pudo realizar correctamente con este id '.$id.''
+                    'error' => 'no se pudo realizar correctamente con este id ' . $id . ''
                 ], 404);
             }
 
             $user->password = Hash::make($request->password);
             $user->save();
             return response()->json([
-                'ok'=> 'Password actualizadas'
-            ],201);
-        }else{
+                'ok' => 'Password actualizadas'
+            ], 201);
+        } else {
             return response()->json([
                 'error' => 'Access prohibited'
             ], 403);
         }
     }
 
-    public function destroy(Request $request,int $id = 0)
+    public function destroy(Request $request, int $id = 0)
     {
-        try{
+        try {
             $request->validate([
                 'rol_user' => 'required|integer',
             ]);
-        } catch(ValidationException $e){
+        } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         }
- 
+
         $rol_user = $request->rol_user;
         $rol = $this->validateRolUser($rol_user);
 
-        if($rol){
-            if($id <= 0){
+        if ($rol) {
+            if ($id <= 0) {
                 return response()->json([
-                    'error'=> 'debe enviar el id del user'
-                ],404);
+                    'error' => 'debe enviar el id del user'
+                ], 404);
             }
-            
+
             $user = Users::find($id);
-            if(is_null($user)){
+            if (is_null($user)) {
                 return response()->json([
-                    'error'=> 'No se pudo realizar correctamente'
-                ],404);
-            }
-
-            $userPorId = $user->id;
-            $trabajador = trabajadores::where('fk_user', $userPorId)->count();
-            if ($trabajador > 0) {
-                return response()->json([
-                    'error' => 'No se puede eliminar el usuario, ya que hay trabajadores asociados.'
-                ], 422);
-            }
-
-            $userPerdidas = perdidas::where('user_fk', $userPorId)->count();
-            if ($userPerdidas > 0) {
-                return response()->json([
-                    'error' => 'No se puede eliminar el usuario, ya que hay perdidas asociadas.'
-                ], 422);
-            }
-
-            $userProductMalEstado = product_mal_estados::where('user_fk', $userPorId)->count();
-            if ($userProductMalEstado > 0) {
-                return response()->json([
-                    'error' => 'No se puede eliminar el usuario, ya que hay Productos mal estado asociadas.'
-                ], 422);
-            }
-
-            $userSinCompromiso = sin_compromisos::where('user_fk', $userPorId)->count();
-            if ($userSinCompromiso > 0) {
-                return response()->json([
-                    'error' => 'No se puede eliminar el usuario, ya que hay Sin compromisos asociadas.'
-                ], 422);
-            }
-
-            $userVent = ventas::where('uservent_fk', $userPorId)->count();
-            if ($userVent > 0) {
-                return response()->json([
-                    'error' => 'No se puede eliminar el usuario, ya que hay ventas asociadas.'
-                ], 422);
-            }
-
-            $userVentSinEnrutar = ventas_sin_enrutar::where('fk_user', $userPorId)->count();
-            if ($userVentSinEnrutar > 0) {
-                return response()->json([
-                    'error' => 'No se puede eliminar el usuario, ya que hay ventas sin enrutar asociadas.'
-                ], 422);
-            }
-
-            $userVentaContado = ventas_contados::where('uservent_cont_fk', $userPorId)->count();
-            if ($userVentaContado > 0) {
-                return response()->json([
-                    'error' => 'No se puede eliminar el usuario, ya que hay ventas de contado asociadas.'
-                ], 422);
+                    'error' => 'No se pudo realizar correctamente'
+                ], 404);
             }
 
             $urlImagenDelete = $user->picture_user;
@@ -389,14 +341,12 @@ class usersController extends Controller
 
             $user->delete();
             return response()->json([
-                'ok'=> 'registro eliminado'
-            ],204);
-        }else{
+                'ok' => 'registro eliminado'
+            ], 204);
+        } else {
             return response()->json([
                 'error' => 'Access prohibited'
             ], 403);
         }
     }
-
-
 }
