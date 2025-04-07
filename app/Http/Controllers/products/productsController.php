@@ -38,7 +38,6 @@ class productsController extends Controller
                 'imagen_prod' => 'required|image|max:10240',
                 'fk_category' => 'required|integer',
                 'fk_brand' => 'required|integer',
-                'fk_image' => 'required|integer',
                 'fk_variant' => 'required|integer',
             ]);
         } catch (ValidationException $e) {
