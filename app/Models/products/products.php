@@ -22,11 +22,11 @@ class products extends Model
 
     public function productVariants()
     {
-        return $this->hasMany(product_variants::class, 'fk_variant', 'pk_variant');
+        return $this->belongsTo(product_variants::class, 'fk_variant', 'pk_variant');
     }
 
     public function productImages()
     {
-        return $this->hasMany(product_images::class, 'fk_image', 'pk_image_product');
+        return $this->belongsTo(product_images::class, 'fk_image', 'pk_image_product');
     }
 }
