@@ -9,13 +9,6 @@ use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use App\Models\users\Users;
 use App\Models\users\roles;
-use App\Models\control_inventario\perdidas;
-use App\Models\control_inventario\product_mal_estados;
-use App\Models\control_inventario\sin_compromisos;
-use App\Models\control_inventario\ventas;
-use App\Models\control_inventario\ventas_contados;
-use App\Models\trabajadores\trabajadores;
-use App\Models\rutasAbonos\ventas_sin_enrutar;
 use Illuminate\Support\Facades\Hash;
 
 class usersController extends Controller
