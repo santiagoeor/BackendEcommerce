@@ -15,7 +15,7 @@ use App\Models\users\roles;
 class authController extends Controller
 {
 
-    public function pruebas()
+    public function testsDeploy()
     {
         return response()->json([
             "ok" => "todo funciona"
@@ -65,19 +65,6 @@ class authController extends Controller
         $pictureUser = $user->picture_user;
         $rol_user = $user->fk_cargo;
 
-        $trabajador = trabajadores::query()
-            ->where('fk_user', '=', $user_id)
-            ->first();
-        // $idTrabajador = $trabajador->pk_trabajador;
-
-        if ($trabajador) {
-            $idTrabajador = $trabajador->pk_trabajador;
-            $nombTrabajador = $trabajador->nombre_trab;
-        } else {
-            $idTrabajador = 0;
-            $nombTrabajador = '';
-        }
-
 
 
         $datosRoles = roles::find($rol_user);
@@ -93,8 +80,6 @@ class authController extends Controller
             'horaActual' => $horaActual,
             'fechaActual' => $fechaActual,
             'user_id' => $user_id,
-            'id_trabajador' => $idTrabajador,
-            'nombTrabajador' => $nombTrabajador,
             'estado_user' => $estado_user,
             'picture' => $pictureUser,
             'nombreRol' => $nombreRol,

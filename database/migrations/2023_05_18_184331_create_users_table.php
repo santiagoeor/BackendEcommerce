@@ -17,6 +17,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('picture_user', 250);
+            $table->char('address', 50);
             $table->boolean('estado_user');
             $table->unsignedBigInteger('fk_cargo');
             $table->foreign('fk_cargo')->references('pk_rol')->on('roles');
