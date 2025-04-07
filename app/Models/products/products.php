@@ -25,11 +25,6 @@ class products extends Model
         return $this->hasMany(product_variants::class, 'fk_variant', 'pk_variant');
     }
 
-    public function productVariant()
-    {
-        return $this->hasOne(product_variants::class, 'fk_variant', 'pk_variant');
-    }
-
     public function productImages()
     {
         return $this->hasMany(product_images::class, 'fk_image', 'pk_image_product');
